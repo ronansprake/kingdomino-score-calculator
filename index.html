@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Kingdomino score calculator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="shortcut icon" href="/images/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@600&display=swap" rel="stylesheet">
+    <style>
+      * { font-family: 'Open Sans', sans-serif; font-weight: 600; color: #444B53; box-sizing: border-box; }
+      body { background-color: #F6F6F6; margin: 0; padding: 40px 0; position: relative; }
+      .wrap { max-width: 400px; padding: 0 20px; margin: 0 auto; }
+      .hide { text-indent: -99em; position: absolute; left: -9999px; width: 0; height: 0; }
+      .players { border: 0; padding: 0; font-size: 14px; margin: 0; }
+      .players legend { position: absolute; top: -999px; }
+      .players ul { overflow: hidden; position: relative; display: block; list-style: none; margin: 0 0 40px; padding: 0; display: flex; flex-direction: row; align-items: center; justify-content: space-evenly; }
+      .players li { width: 50%; }
+      .players label { border: 1px solid #DDD; display: block; background: #FFF; color: #999; padding: 6px 10px; margin-bottom: 5px; cursor: pointer; transition: .2s background; position: relative; text-align: center; }
+      .players span { color: #999; }
+      .players li:first-child label { border-radius: 4px 0 0 4px; border-right-color: #FFF; }
+      .players li:last-child label { border-radius: 0 4px 4px 0; }
+      .players li:nth-child(2) label, .players li:nth-child(3) label { border-right-color: #FFF; }
+      input[type="radio"] { opacity: 0; position: absolute; }
+      .players li input[type="radio"]:checked + label { border: 1px solid #444B53; background: #EEE; color: #444B53; }
+      .players li input[type="radio"]:checked + label span { color: #444B53; }
+      label { -webkit-tap-highlight-color: rgba(0,0,0,0); }
+      input[type="number"] { width: 40px; height: 40px; line-height: 38px; padding: 0; border: 1px solid #444B53; text-align: center; -moz-appearance: textfield; font-size: 18px; }
+      input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+      .bonuses button { background: #FFF; font-size: 12px; border: 1px solid #444B53; cursor: pointer; line-height: 36px; padding: 0 10px; margin-right: 15px; }
+      .bonuses button.on { background: #444B53; color: #FFF ; }
+      .territories { list-style: none; margin: 0; padding: 0; }
+      .row { margin-bottom: 30px; }
+      .row-mini { display: flex; flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 15px; }
+      .row-label { font-size: 16px; margin: 0 0 15px; }
+      .row-mini-label { font-size: 12px; width: 70px; display: block; }
+      .total-score { font-size: 20px; margin-top: 40px; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1 class="hide">Kingdomino score calculator</h1>
+      <fieldset class="players">
+        <legend>Player</legend>
+        <ul>
+          <li>
+            <input type="radio" name="player" id="player-1" value="1" class="js-player-switch" checked tabindex="1">
+            <label for="player-1">1 (<span class="js-total-score" data-player="1">0</span>)</label>
+          </li>
+          <li>
+            <input type="radio" name="player" id="player-2" value="2" class="js-player-switch" tabindex="2">
+            <label for="player-2">2 (<span class="js-total-score" data-player="2">0</span>)</label>
+          </li>
+          <li>
+            <input type="radio" name="player" id="player-3" value="3" class="js-player-switch" tabindex="3">
+            <label for="player-3">3 (<span class="js-total-score" data-player="3">0</span>)</label>
+          </li>
+          <li>
+            <input type="radio" name="player" id="player-4" value="4" class="js-player-switch" tabindex="4">
+            <label for="player-4">4 (<span class="js-total-score" data-player="4">0</span>)</label>
+          </li>
+        </ul>
+      </fieldset>
+      
+      <div class="hide">
+        <label for="player">Player</label>
+        <input id="player" type="number" min="0" class="js-player" value="1" tabindex="-1" disabled />
+      </div>
+      <div class="js-player-area" data-player="1">
+        <ul class="territories">
+          <li class="row">
+            <h2 class="row-label">Grasslands (<span class="js-territory-subtotal-text" data-player="1" data-territory="1">0</span>)</h2>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-1-1-1-1">Crowns</label>
+              <input id="score-1-1-1-1" type="number" min="0" class="js-score" data-player="1" data-territory="1" data-area="1" data-count="crowns" value="0" tabindex="5" />
+              <label class="hide" for="score-1-1-2-1">Crowns</label>
+              <input id="score-1-1-2-1" type="number" min="0" class="js-score" data-player="1" data-territory="1" data-area="2" data-count="crowns" value="0" tabindex="7" />
+              <label class="hide" for="score-1-1-3-1">Area 3 crowns</label>
+              <input id="score-1-1-3-1" type="number" min="0" class="js-score" data-player="1" data-territory="1" data-area="3" data-count="crowns" value="0" tabindex="9" />
+              <label class="hide" for="score-1-1-4-1">Area 4 crowns</label>
+              <input id="score-1-1-4-1" type="number" min="0" class="js-score" data-player="1" data-territory="1" data-area="4" data-count="crowns" value="0" tabindex="11" />
+            </div>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-1-1-1-2">Squares</label>
+              <input id="score-1-1-1-2" type="number" min="0" class="js-score" data-player="1" data-territory="1" data-area="1" data-count="squares" value="0" tabindex="6" />
+              <label class="hide" for="score-1-1-2-2">Crowns</label>
+              <input id="score-1-1-2-2" type="number" min="0" class="js-score" data-player="1" data-territory="1" data-area="2" data-count="squares" value="0" tabindex="8" />
+              <label class="hide" for="score-1-1-3-2">Area 3 crowns</label>
+              <input id="score-1-1-3-2" type="number" min="0" class="js-score" data-player="1" data-territory="1" data-area="3" data-count="squares" value="0" tabindex="10" />
+              <label class="hide" for="score-1-1-4-2">Area 4 crowns</label>
+              <input id="score-1-1-4-2" type="number" min="0" class="js-score" data-player="1" data-territory="1" data-area="4" data-count="squares" value="0" tabindex="12" />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Subtotals</span>
+              <label class="hide" for="score-1-1-1">Area 1 totals</label>
+              <input id="score-1-1-1" type="number" min="0" class="js-area-subtotal" data-player="1" data-territory="1" data-area="1" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-1-1-2">Area 2 total</label>
+              <input id="score-1-1-2" type="number" min="0" class="js-area-subtotal" data-player="1" data-territory="1" data-area="2" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-1-1-3">Area 3 total</label>
+              <input id="score-1-1-3" type="number" min="0" class="js-area-subtotal" data-player="1" data-territory="1" data-area="3" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-1-1-4">Area 4 total</label>
+              <input id="score-1-1-4" type="number" min="0" class="js-area-subtotal" data-player="1" data-territory="1" data-area="4" value="0" tabindex="-1" disabled />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Total</span>
+              <label class="hide" for="score-1-1">Territory 1 total</label>
+              <input id="score-1-1" type="number" min="0" class="js-territory-subtotal" data-player="1" data-territory="1" value="0" tabindex="-1" disabled />
+            </div>
+          </li>
+          <li class="row">
+            <h2 class="row-label">Cornfields (<span class="js-territory-subtotal-text" data-player="1" data-territory="2">0</span>)</h2>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-1-2-1-1">Crowns</label>
+              <input id="score-1-2-1-1" type="number" min="0" class="js-score" data-player="1" data-territory="2" data-area="1" data-count="crowns" value="0" tabindex="13" />
+              <label class="hide" for="score-1-2-2-1">Crowns</label>
+              <input id="score-1-2-2-1" type="number" min="0" class="js-score" data-player="1" data-territory="2" data-area="2" data-count="crowns" value="0" tabindex="15" />
+              <label class="hide" for="score-1-2-3-1">Area 3 crowns</label>
+              <input id="score-1-2-3-1" type="number" min="0" class="js-score" data-player="1" data-territory="2" data-area="3" data-count="crowns" value="0" tabindex="17" />
+              <label class="hide" for="score-1-2-4-1">Area 4 crowns</label>
+              <input id="score-1-2-4-1" type="number" min="0" class="js-score" data-player="1" data-territory="2" data-area="4" data-count="crowns" value="0" tabindex="19" />
+            </div>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-1-2-1-2">Squares</label>
+              <input id="score-1-2-1-2" type="number" min="0" class="js-score" data-player="1" data-territory="2" data-area="1" data-count="squares" value="0" tabindex="14" />
+              <label class="hide" for="score-1-2-2-2">Crowns</label>
+              <input id="score-1-2-2-2" type="number" min="0" class="js-score" data-player="1" data-territory="2" data-area="2" data-count="squares" value="0" tabindex="16" />
+              <label class="hide" for="score-1-2-3-2">Area 3 crowns</label>
+              <input id="score-1-2-3-2" type="number" min="0" class="js-score" data-player="1" data-territory="2" data-area="3" data-count="squares" value="0" tabindex="18" />
+              <label class="hide" for="score-1-2-4-2">Area 4 crowns</label>
+              <input id="score-1-2-4-2" type="number" min="0" class="js-score" data-player="1" data-territory="2" data-area="4" data-count="squares" value="0" tabindex="20" />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Subtotals</span>
+              <label class="hide" for="score-1-2-1">Area 1 totals</label>
+              <input id="score-1-2-1" type="number" min="0" class="js-area-subtotal" data-player="1" data-territory="2" data-area="1" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-1-2-2">Area 2 total</label>
+              <input id="score-1-2-2" type="number" min="0" class="js-area-subtotal" data-player="1" data-territory="2" data-area="2" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-1-2-3">Area 3 total</label>
+              <input id="score-1-2-3" type="number" min="0" class="js-area-subtotal" data-player="1" data-territory="2" data-area="3" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-1-2-4">Area 4 total</label>
+              <input id="score-1-2-4" type="number" min="0" class="js-area-subtotal" data-player="1" data-territory="2" data-area="4" value="0" tabindex="-1" disabled />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Total</span>
+              <label class="hide" for="score-1-2">Territory 2 total</label>
+              <input id="score-1-2" type="number" min="0" class="js-territory-subtotal" data-player="1" data-territory="2" value="0" tabindex="-1" disabled />
+            </div>
+          </li>
+          <li class="row">
+            <h2 class="row-label">Wastelands (<span class="js-territory-subtotal-text" data-player="1" data-territory="3">0</span>)</h2>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-1-3-1-1">Crowns</label>
+              <input id="score-1-3-1-1" type="number" min="0" class="js-score" data-player="1" data-territory="3" data-area="1" data-count="crowns" value="0" tabindex="21" />
+              <label class="hide" for="score-1-3-2-1">Crowns</label>
+              <input id="score-1-3-2-1" type="number" min="0" class="js-score" data-player="1" data-territory="3" data-area="2" data-count="crowns" value="0" tabindex="23" />
+              <label class="hide" for="score-1-3-3-1">Area 3 crowns</label>
+              <input id="score-1-3-3-1" type="number" min="0" class="js-score" data-player="1" data-territory="3" data-area="3" data-count="crowns" value="0" tabindex="25" />
+              <label class="hide" for="score-1-3-4-1">Area 4 crowns</label>
+              <input id="score-1-3-4-1" type="number" min="0" class="js-score" data-player="1" data-territory="3" data-area="4" data-count="crowns" value="0" tabindex="27" />
+            </div>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-1-3-1-2">Squares</label>
+              <input id="score-1-3-1-2" type="number" min="0" class="js-score" data-player="1" data-territory="3" data-area="1" data-count="squares" value="0" tabindex="22" />
+              <label class="hide" for="score-1-3-2-2">Crowns</label>
+              <input id="score-1-3-2-2" type="number" min="0" class="js-score" data-player="1" data-territory="3" data-area="2" data-count="squares" value="0" tabindex="24" />
+              <label class="hide" for="score-1-3-3-2">Area 3 crowns</label>
+              <input id="score-1-3-3-2" type="number" min="0" class="js-score" data-player="1" data-territory="3" data-area="3" data-count="squares" value="0" tabindex="26" />
+              <label class="hide" for="score-1-3-4-2">Area 4 crowns</label>
+              <input id="score-1-3-4-2" type="number" min="0" class="js-score" data-player="1" data-territory="3" data-area="4" data-count="squares" value="0" tabindex="28" />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Subtotals</span>
+              <label class="hide" for="score-1-3-1">Area 1 totals</label>
+              <input id="score-1-3-1" type="number" min="0" class="js-area-subtotal" data-player="1" data-territory="3" data-area="1" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-1-3-2">Area 2 total</label>
+              <input id="score-1-3-2" type="number" min="0" class="js-area-subtotal" data-player="1" data-territory="3" data-area="2" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-1-3-3">Area 3 total</label>
+              <input id="score-1-3-3" type="number" min="0" class="js-area-subtotal" data-player="1" data-territory="3" data-area="3" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-1-3-4">Area 4 total</label>
+              <input id="score-1-3-4" type="number" min="0" class="js-area-subtotal" data-player="1" data-territory="3" data-area="4" value="0" tabindex="-1" disabled />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Total</span>
+              <label class="hide" for="score-1-3">Territory 3 total</label>
+              <input id="score-1-3" type="number" min="0" class="js-territory-subtotal" data-player="1" data-territory="3" value="0" tabindex="-1" disabled />
+            </div>
+          </li>
+          <li class="row">
+            <h2 class="row-label">Woods (<span class="js-territory-subtotal-text" data-player="1" data-territory="4">0</span>)</h2>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-1-4-1-1">Crowns</label>
+              <input id="score-1-4-1-1" type="number" min="0" class="js-score" data-player="1" data-territory="4" data-area="1" data-count="crowns" value="0" tabindex="29" />
+              <label class="hide" for="score-1-4-2-1">Crowns</label>
+              <input id="score-1-4-2-1" type="number" min="0" class="js-score" data-player="1" data-territory="4" data-area="2" data-count="crowns" value="0" tabindex="31" />
+              <label class="hide" for="score-1-4-3-1">Area 3 crowns</label>
+              <input id="score-1-4-3-1" type="number" min="0" class="js-score" data-player="1" data-territory="4" data-area="3" data-count="crowns" value="0" tabindex="33" />
+              <label class="hide" for="score-1-4-4-1">Area 4 crowns</label>
+              <input id="score-1-4-4-1" type="number" min="0" class="js-score" data-player="1" data-territory="4" data-area="4" data-count="crowns" value="0" tabindex="35" />
+            </div>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-1-4-1-2">Squares</label>
+              <input id="score-1-4-1-2" type="number" min="0" class="js-score" data-player="1" data-territory="4" data-area="1" data-count="squares" value="0" tabindex="30" />
+              <label class="hide" for="score-1-4-2-2">Crowns</label>
+              <input id="score-1-4-2-2" type="number" min="0" class="js-score" data-player="1" data-territory="4" data-area="2" data-count="squares" value="0" tabindex="32" />
+              <label class="hide" for="score-1-4-3-2">Area 3 crowns</label>
+              <input id="score-1-4-3-2" type="number" min="0" class="js-score" data-player="1" data-territory="4" data-area="3" data-count="squares" value="0" tabindex="34" />
+              <label class="hide" for="score-1-4-4-2">Area 4 crowns</label>
+              <input id="score-1-4-4-2" type="number" min="0" class="js-score" data-player="1" data-territory="4" data-area="4" data-count="squares" value="0" tabindex="36" />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Subtotals</span>
+              <label class="hide" for="score-1-4-1">Area 1 totals</label>
+              <input id="score-1-4-1" type="number" min="0" class="js-area-subtotal" data-player="1" data-territory="4" data-area="1" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-1-4-2">Area 2 total</label>
+              <input id="score-1-4-2" type="number" min="0" class="js-area-subtotal" data-player="1" data-territory="4" data-area="2" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-1-4-3">Area 3 total</label>
+              <input id="score-1-4-3" type="number" min="0" class="js-area-subtotal" data-player="1" data-territory="4" data-area="3" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-1-4-4">Area 4 total</label>
+              <input id="score-1-4-4" type="number" min="0" class="js-area-subtotal" data-player="1" data-territory="4" data-area="4" value="0" tabindex="-1" disabled />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Total</span>
+              <label class="hide" for="score-1-4">Territory 4 total</label>
+              <input id="score-1-4" type="number" min="0" class="js-territory-subtotal" data-player="1" data-territory="4" value="0" tabindex="-1" disabled />
+            </div>
+          </li>
+          <li class="row">
+            <h2 class="row-label">Lakes (<span class="js-territory-subtotal-text" data-player="1" data-territory="5">0</span>)</h2>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-1-5-1-1">Crowns</label>
+              <input id="score-1-5-1-1" type="number" min="0" class="js-score" data-player="1" data-territory="5" data-area="1" data-count="crowns" value="0" tabindex="37" />
+              <label class="hide" for="score-1-5-2-1">Crowns</label>
+              <input id="score-1-5-2-1" type="number" min="0" class="js-score" data-player="1" data-territory="5" data-area="2" data-count="crowns" value="0" tabindex="39" />
+              <label class="hide" for="score-1-5-3-1">Area 3 crowns</label>
+              <input id="score-1-5-3-1" type="number" min="0" class="js-score" data-player="1" data-territory="5" data-area="3" data-count="crowns" value="0" tabindex="41" />
+              <label class="hide" for="score-1-5-4-1">Area 4 crowns</label>
+              <input id="score-1-5-4-1" type="number" min="0" class="js-score" data-player="1" data-territory="5" data-area="4" data-count="crowns" value="0" tabindex="43" />
+            </div>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-1-5-1-2">Squares</label>
+              <input id="score-1-5-1-2" type="number" min="0" class="js-score" data-player="1" data-territory="5" data-area="1" data-count="squares" value="0" tabindex="38" />
+              <label class="hide" for="score-1-5-2-2">Crowns</label>
+              <input id="score-1-5-2-2" type="number" min="0" class="js-score" data-player="1" data-territory="5" data-area="2" data-count="squares" value="0" tabindex="40" />
+              <label class="hide" for="score-1-5-3-2">Area 3 crowns</label>
+              <input id="score-1-5-3-2" type="number" min="0" class="js-score" data-player="1" data-territory="5" data-area="3" data-count="squares" value="0" tabindex="42" />
+              <label class="hide" for="score-1-5-4-2">Area 4 crowns</label>
+              <input id="score-1-5-4-2" type="number" min="0" class="js-score" data-player="1" data-territory="5" data-area="4" data-count="squares" value="0" tabindex="44" />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Subtotals</span>
+              <label class="hide" for="score-1-5-1">Area 1 totals</label>
+              <input id="score-1-5-1" type="number" min="0" class="js-area-subtotal" data-player="1" data-territory="5" data-area="1" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-1-5-2">Area 2 total</label>
+              <input id="score-1-5-2" type="number" min="0" class="js-area-subtotal" data-player="1" data-territory="5" data-area="2" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-1-5-3">Area 3 total</label>
+              <input id="score-1-5-3" type="number" min="0" class="js-area-subtotal" data-player="1" data-territory="5" data-area="3" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-1-5-4">Area 4 total</label>
+              <input id="score-1-5-4" type="number" min="0" class="js-area-subtotal" data-player="1" data-territory="5" data-area="4" value="0" tabindex="-1" disabled />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Total</span>
+              <label class="hide" for="score-1-5">Territory 5 total</label>
+              <input id="score-1-5" type="number" min="0" class="js-territory-subtotal" data-player="1" data-territory="5" value="0" tabindex="-1" disabled />
+            </div>
+          </li>
+          <li class="row">
+            <h2 class="row-label">Caves (<span class="js-territory-subtotal-text" data-player="1" data-territory="6">0</span>)</h2>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-1-6-1-1">Crowns</label>
+              <input id="score-1-6-1-1" type="number" min="0" class="js-score" data-player="1" data-territory="6" data-area="1" data-count="crowns" value="0" tabindex="45" />
+              <label class="hide" for="score-1-6-2-1">Crowns</label>
+              <input id="score-1-6-2-1" type="number" min="0" class="js-score" data-player="1" data-territory="6" data-area="2" data-count="crowns" value="0" tabindex="47" />
+              <label class="hide" for="score-1-6-3-1">Area 3 crowns</label>
+              <input id="score-1-6-3-1" type="number" min="0" class="js-score" data-player="1" data-territory="6" data-area="3" data-count="crowns" value="0" tabindex="49" />
+              <label class="hide" for="score-1-6-4-1">Area 4 crowns</label>
+              <input id="score-1-6-4-1" type="number" min="0" class="js-score" data-player="1" data-territory="6" data-area="4" data-count="crowns" value="0" tabindex="51" />
+            </div>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-1-6-1-2">Squares</label>
+              <input id="score-1-6-1-2" type="number" min="0" class="js-score" data-player="1" data-territory="6" data-area="1" data-count="squares" value="0" tabindex="46" />
+              <label class="hide" for="score-1-6-2-2">Crowns</label>
+              <input id="score-1-6-2-2" type="number" min="0" class="js-score" data-player="1" data-territory="6" data-area="2" data-count="squares" value="0" tabindex="48" />
+              <label class="hide" for="score-1-6-3-2">Area 3 crowns</label>
+              <input id="score-1-6-3-2" type="number" min="0" class="js-score" data-player="1" data-territory="6" data-area="3" data-count="squares" value="0" tabindex="50" />
+              <label class="hide" for="score-1-6-4-2">Area 4 crowns</label>
+              <input id="score-1-6-4-2" type="number" min="0" class="js-score" data-player="1" data-territory="6" data-area="4" data-count="squares" value="0" tabindex="52" />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Subtotals</span>
+              <label class="hide" for="score-1-6-1">Area 1 totals</label>
+              <input id="score-1-6-1" type="number" min="0" class="js-area-subtotal" data-player="1" data-territory="6" data-area="1" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-1-6-2">Area 2 total</label>
+              <input id="score-1-6-2" type="number" min="0" class="js-area-subtotal" data-player="1" data-territory="6" data-area="2" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-1-6-3">Area 3 total</label>
+              <input id="score-1-6-3" type="number" min="0" class="js-area-subtotal" data-player="1" data-territory="6" data-area="3" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-1-6-4">Area 4 total</label>
+              <input id="score-1-6-4" type="number" min="0" class="js-area-subtotal" data-player="1" data-territory="6" data-area="4" value="0" tabindex="-1" disabled />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Total</span>
+              <label class="hide" for="score-1-6">Territory 6 total</label>
+              <input id="score-1-6" type="number" min="0" class="js-territory-subtotal" data-player="1" data-territory="6" value="0" tabindex="-1" disabled />
+            </div>
+          </li>
+        </ul>
+        <div class="bonuses">
+          <h2 class="row-label">Bonuses (<span class="js-total-bonus">0</span>)</h2>
+          <button class="js-bonus" data-value="5" data-player="1" data-active="off">Complete +5</button>
+          <button class="js-bonus" data-value="10" data-player="1" data-active="off">Centre castle +10</button>
+        </div>
+        <div class="total-score">Player 1 score = <span class="js-total-score" data-player="1">0</span></div>
+      </div>
+      <div class="js-player-area" data-player="2" style="display: none;">
+        <ul class="territories">
+          <li class="row">
+            <h2 class="row-label">Grasslands (<span class="js-territory-subtotal-text" data-player="2" data-territory="1">0</span>)</h2>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-2-1-1-1">Crowns</label>
+              <input id="score-2-1-1-1" type="number" min="0" class="js-score" data-player="2" data-territory="1" data-area="1" data-count="crowns" value="0" tabindex="53" />
+              <label class="hide" for="score-2-1-2-1">Crowns</label>
+              <input id="score-2-1-2-1" type="number" min="0" class="js-score" data-player="2" data-territory="1" data-area="2" data-count="crowns" value="0" tabindex="55" />
+              <label class="hide" for="score-2-1-3-1">Area 3 crowns</label>
+              <input id="score-2-1-3-1" type="number" min="0" class="js-score" data-player="2" data-territory="1" data-area="3" data-count="crowns" value="0" tabindex="57" />
+              <label class="hide" for="score-2-1-4-1">Area 4 crowns</label>
+              <input id="score-2-1-4-1" type="number" min="0" class="js-score" data-player="2" data-territory="1" data-area="4" data-count="crowns" value="0" tabindex="59" />
+            </div>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-2-1-1-2">Squares</label>
+              <input id="score-2-1-1-2" type="number" min="0" class="js-score" data-player="2" data-territory="1" data-area="1" data-count="squares" value="0" tabindex="54" />
+              <label class="hide" for="score-2-1-2-2">Crowns</label>
+              <input id="score-2-1-2-2" type="number" min="0" class="js-score" data-player="2" data-territory="1" data-area="2" data-count="squares" value="0" tabindex="56" />
+              <label class="hide" for="score-2-1-3-2">Area 3 crowns</label>
+              <input id="score-2-1-3-2" type="number" min="0" class="js-score" data-player="2" data-territory="1" data-area="3" data-count="squares" value="0" tabindex="58" />
+              <label class="hide" for="score-2-1-4-2">Area 4 crowns</label>
+              <input id="score-2-1-4-2" type="number" min="0" class="js-score" data-player="2" data-territory="1" data-area="4" data-count="squares" value="0" tabindex="60" />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Subtotals</span>
+              <label class="hide" for="score-2-1-1">Area 1 totals</label>
+              <input id="score-2-1-1" type="number" min="0" class="js-area-subtotal" data-player="2" data-territory="1" data-area="1" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-2-1-2">Area 2 total</label>
+              <input id="score-2-1-2" type="number" min="0" class="js-area-subtotal" data-player="2" data-territory="1" data-area="2" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-2-1-3">Area 3 total</label>
+              <input id="score-2-1-3" type="number" min="0" class="js-area-subtotal" data-player="2" data-territory="1" data-area="3" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-2-1-4">Area 4 total</label>
+              <input id="score-2-1-4" type="number" min="0" class="js-area-subtotal" data-player="2" data-territory="1" data-area="4" value="0" tabindex="-1" disabled />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Total</span>
+              <label class="hide" for="score-2-1">Territory 1 total</label>
+              <input id="score-2-1" type="number" min="0" class="js-territory-subtotal" data-player="2" data-territory="1" value="0" tabindex="-1" disabled />
+            </div>
+          </li>
+          <li class="row">
+            <h2 class="row-label">Cornfields (<span class="js-territory-subtotal-text" data-player="2" data-territory="2">0</span>)</h2>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-2-2-1-1">Crowns</label>
+              <input id="score-2-2-1-1" type="number" min="0" class="js-score" data-player="2" data-territory="2" data-area="1" data-count="crowns" value="0" tabindex="61" />
+              <label class="hide" for="score-2-2-2-1">Crowns</label>
+              <input id="score-2-2-2-1" type="number" min="0" class="js-score" data-player="2" data-territory="2" data-area="2" data-count="crowns" value="0" tabindex="63" />
+              <label class="hide" for="score-2-2-3-1">Area 3 crowns</label>
+              <input id="score-2-2-3-1" type="number" min="0" class="js-score" data-player="2" data-territory="2" data-area="3" data-count="crowns" value="0" tabindex="65" />
+              <label class="hide" for="score-2-2-4-1">Area 4 crowns</label>
+              <input id="score-2-2-4-1" type="number" min="0" class="js-score" data-player="2" data-territory="2" data-area="4" data-count="crowns" value="0" tabindex="67" />
+            </div>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-2-2-1-2">Squares</label>
+              <input id="score-2-2-1-2" type="number" min="0" class="js-score" data-player="2" data-territory="2" data-area="1" data-count="squares" value="0" tabindex="62" />
+              <label class="hide" for="score-2-2-2-2">Crowns</label>
+              <input id="score-2-2-2-2" type="number" min="0" class="js-score" data-player="2" data-territory="2" data-area="2" data-count="squares" value="0" tabindex="64" />
+              <label class="hide" for="score-2-2-3-2">Area 3 crowns</label>
+              <input id="score-2-2-3-2" type="number" min="0" class="js-score" data-player="2" data-territory="2" data-area="3" data-count="squares" value="0" tabindex="66" />
+              <label class="hide" for="score-2-2-4-2">Area 4 crowns</label>
+              <input id="score-2-2-4-2" type="number" min="0" class="js-score" data-player="2" data-territory="2" data-area="4" data-count="squares" value="0" tabindex="68" />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Subtotals</span>
+              <label class="hide" for="score-2-2-1">Area 1 totals</label>
+              <input id="score-2-2-1" type="number" min="0" class="js-area-subtotal" data-player="2" data-territory="2" data-area="1" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-2-2-2">Area 2 total</label>
+              <input id="score-2-2-2" type="number" min="0" class="js-area-subtotal" data-player="2" data-territory="2" data-area="2" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-2-2-3">Area 3 total</label>
+              <input id="score-2-2-3" type="number" min="0" class="js-area-subtotal" data-player="2" data-territory="2" data-area="3" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-2-2-4">Area 4 total</label>
+              <input id="score-2-2-4" type="number" min="0" class="js-area-subtotal" data-player="2" data-territory="2" data-area="4" value="0" tabindex="-1" disabled />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Total</span>
+              <label class="hide" for="score-2-2">Territory 2 total</label>
+              <input id="score-2-2" type="number" min="0" class="js-territory-subtotal" data-player="2" data-territory="2" value="0" tabindex="-1" disabled />
+            </div>
+          </li>
+          <li class="row">
+            <h2 class="row-label">Wastelands (<span class="js-territory-subtotal-text" data-player="2" data-territory="3">0</span>)</h2>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-2-3-1-1">Crowns</label>
+              <input id="score-2-3-1-1" type="number" min="0" class="js-score" data-player="2" data-territory="3" data-area="1" data-count="crowns" value="0" tabindex="69" />
+              <label class="hide" for="score-2-3-2-1">Crowns</label>
+              <input id="score-2-3-2-1" type="number" min="0" class="js-score" data-player="2" data-territory="3" data-area="2" data-count="crowns" value="0" tabindex="71" />
+              <label class="hide" for="score-2-3-3-1">Area 3 crowns</label>
+              <input id="score-2-3-3-1" type="number" min="0" class="js-score" data-player="2" data-territory="3" data-area="3" data-count="crowns" value="0" tabindex="73" />
+              <label class="hide" for="score-2-3-4-1">Area 4 crowns</label>
+              <input id="score-2-3-4-1" type="number" min="0" class="js-score" data-player="2" data-territory="3" data-area="4" data-count="crowns" value="0" tabindex="75" />
+            </div>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-2-3-1-2">Squares</label>
+              <input id="score-2-3-1-2" type="number" min="0" class="js-score" data-player="2" data-territory="3" data-area="1" data-count="squares" value="0" tabindex="70" />
+              <label class="hide" for="score-2-3-2-2">Crowns</label>
+              <input id="score-2-3-2-2" type="number" min="0" class="js-score" data-player="2" data-territory="3" data-area="2" data-count="squares" value="0" tabindex="72" />
+              <label class="hide" for="score-2-3-3-2">Area 3 crowns</label>
+              <input id="score-2-3-3-2" type="number" min="0" class="js-score" data-player="2" data-territory="3" data-area="3" data-count="squares" value="0" tabindex="74" />
+              <label class="hide" for="score-2-3-4-2">Area 4 crowns</label>
+              <input id="score-2-3-4-2" type="number" min="0" class="js-score" data-player="2" data-territory="3" data-area="4" data-count="squares" value="0" tabindex="76" />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Subtotals</span>
+              <label class="hide" for="score-2-3-1">Area 1 totals</label>
+              <input id="score-2-3-1" type="number" min="0" class="js-area-subtotal" data-player="2" data-territory="3" data-area="1" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-2-3-2">Area 2 total</label>
+              <input id="score-2-3-2" type="number" min="0" class="js-area-subtotal" data-player="2" data-territory="3" data-area="2" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-2-3-3">Area 3 total</label>
+              <input id="score-2-3-3" type="number" min="0" class="js-area-subtotal" data-player="2" data-territory="3" data-area="3" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-2-3-4">Area 4 total</label>
+              <input id="score-2-3-4" type="number" min="0" class="js-area-subtotal" data-player="2" data-territory="3" data-area="4" value="0" tabindex="-1" disabled />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Total</span>
+              <label class="hide" for="score-2-3">Territory 3 total</label>
+              <input id="score-2-3" type="number" min="0" class="js-territory-subtotal" data-player="2" data-territory="3" value="0" tabindex="-1" disabled />
+            </div>
+          </li>
+          <li class="row">
+            <h2 class="row-label">Woods (<span class="js-territory-subtotal-text" data-player="2" data-territory="4">0</span>)</h2>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-2-4-1-1">Crowns</label>
+              <input id="score-2-4-1-1" type="number" min="0" class="js-score" data-player="2" data-territory="4" data-area="1" data-count="crowns" value="0" tabindex="77" />
+              <label class="hide" for="score-2-4-2-1">Crowns</label>
+              <input id="score-2-4-2-1" type="number" min="0" class="js-score" data-player="2" data-territory="4" data-area="2" data-count="crowns" value="0" tabindex="79" />
+              <label class="hide" for="score-2-4-3-1">Area 3 crowns</label>
+              <input id="score-2-4-3-1" type="number" min="0" class="js-score" data-player="2" data-territory="4" data-area="3" data-count="crowns" value="0" tabindex="81" />
+              <label class="hide" for="score-2-4-4-1">Area 4 crowns</label>
+              <input id="score-2-4-4-1" type="number" min="0" class="js-score" data-player="2" data-territory="4" data-area="4" data-count="crowns" value="0" tabindex="83" />
+            </div>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-2-4-1-2">Squares</label>
+              <input id="score-2-4-1-2" type="number" min="0" class="js-score" data-player="2" data-territory="4" data-area="1" data-count="squares" value="0" tabindex="78" />
+              <label class="hide" for="score-2-4-2-2">Crowns</label>
+              <input id="score-2-4-2-2" type="number" min="0" class="js-score" data-player="2" data-territory="4" data-area="2" data-count="squares" value="0" tabindex="80" />
+              <label class="hide" for="score-2-4-3-2">Area 3 crowns</label>
+              <input id="score-2-4-3-2" type="number" min="0" class="js-score" data-player="2" data-territory="4" data-area="3" data-count="squares" value="0" tabindex="82" />
+              <label class="hide" for="score-2-4-4-2">Area 4 crowns</label>
+              <input id="score-2-4-4-2" type="number" min="0" class="js-score" data-player="2" data-territory="4" data-area="4" data-count="squares" value="0" tabindex="84" />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Subtotals</span>
+              <label class="hide" for="score-2-4-1">Area 1 totals</label>
+              <input id="score-2-4-1" type="number" min="0" class="js-area-subtotal" data-player="2" data-territory="4" data-area="1" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-2-4-2">Area 2 total</label>
+              <input id="score-2-4-2" type="number" min="0" class="js-area-subtotal" data-player="2" data-territory="4" data-area="2" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-2-4-3">Area 3 total</label>
+              <input id="score-2-4-3" type="number" min="0" class="js-area-subtotal" data-player="2" data-territory="4" data-area="3" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-2-4-4">Area 4 total</label>
+              <input id="score-2-4-4" type="number" min="0" class="js-area-subtotal" data-player="2" data-territory="4" data-area="4" value="0" tabindex="-1" disabled />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Total</span>
+              <label class="hide" for="score-2-4">Territory 4 total</label>
+              <input id="score-2-4" type="number" min="0" class="js-territory-subtotal" data-player="2" data-territory="4" value="0" tabindex="-1" disabled />
+            </div>
+          </li>
+          <li class="row">
+            <h2 class="row-label">Lakes (<span class="js-territory-subtotal-text" data-player="2" data-territory="5">0</span>)</h2>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-2-5-1-1">Crowns</label>
+              <input id="score-2-5-1-1" type="number" min="0" class="js-score" data-player="2" data-territory="5" data-area="1" data-count="crowns" value="0" tabindex="85" />
+              <label class="hide" for="score-2-5-2-1">Crowns</label>
+              <input id="score-2-5-2-1" type="number" min="0" class="js-score" data-player="2" data-territory="5" data-area="2" data-count="crowns" value="0" tabindex="87" />
+              <label class="hide" for="score-2-5-3-1">Area 3 crowns</label>
+              <input id="score-2-5-3-1" type="number" min="0" class="js-score" data-player="2" data-territory="5" data-area="3" data-count="crowns" value="0" tabindex="89" />
+              <label class="hide" for="score-2-5-4-1">Area 4 crowns</label>
+              <input id="score-2-5-4-1" type="number" min="0" class="js-score" data-player="2" data-territory="5" data-area="4" data-count="crowns" value="0" tabindex="91" />
+            </div>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-2-5-1-2">Squares</label>
+              <input id="score-2-5-1-2" type="number" min="0" class="js-score" data-player="2" data-territory="5" data-area="1" data-count="squares" value="0" tabindex="86" />
+              <label class="hide" for="score-2-5-2-2">Crowns</label>
+              <input id="score-2-5-2-2" type="number" min="0" class="js-score" data-player="2" data-territory="5" data-area="2" data-count="squares" value="0" tabindex="88" />
+              <label class="hide" for="score-2-5-3-2">Area 3 crowns</label>
+              <input id="score-2-5-3-2" type="number" min="0" class="js-score" data-player="2" data-territory="5" data-area="3" data-count="squares" value="0" tabindex="90" />
+              <label class="hide" for="score-2-5-4-2">Area 4 crowns</label>
+              <input id="score-2-5-4-2" type="number" min="0" class="js-score" data-player="2" data-territory="5" data-area="4" data-count="squares" value="0" tabindex="93" />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Subtotals</span>
+              <label class="hide" for="score-2-5-1">Area 1 totals</label>
+              <input id="score-2-5-1" type="number" min="0" class="js-area-subtotal" data-player="2" data-territory="5" data-area="1" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-2-5-2">Area 2 total</label>
+              <input id="score-2-5-2" type="number" min="0" class="js-area-subtotal" data-player="2" data-territory="5" data-area="2" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-2-5-3">Area 3 total</label>
+              <input id="score-2-5-3" type="number" min="0" class="js-area-subtotal" data-player="2" data-territory="5" data-area="3" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-2-5-4">Area 4 total</label>
+              <input id="score-2-5-4" type="number" min="0" class="js-area-subtotal" data-player="2" data-territory="5" data-area="4" value="0" tabindex="-1" disabled />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Total</span>
+              <label class="hide" for="score-2-5">Territory 5 total</label>
+              <input id="score-2-5" type="number" min="0" class="js-territory-subtotal" data-player="2" data-territory="5" value="0" tabindex="-1" disabled />
+            </div>
+          </li>
+          <li class="row">
+            <h2 class="row-label">Caves (<span class="js-territory-subtotal-text" data-player="2" data-territory="6">0</span>)</h2>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-2-6-1-1">Crowns</label>
+              <input id="score-2-6-1-1" type="number" min="0" class="js-score" data-player="2" data-territory="6" data-area="1" data-count="crowns" value="0" tabindex="94" />
+              <label class="hide" for="score-2-6-2-1">Crowns</label>
+              <input id="score-2-6-2-1" type="number" min="0" class="js-score" data-player="2" data-territory="6" data-area="2" data-count="crowns" value="0" tabindex="96" />
+              <label class="hide" for="score-2-6-3-1">Area 3 crowns</label>
+              <input id="score-2-6-3-1" type="number" min="0" class="js-score" data-player="2" data-territory="6" data-area="3" data-count="crowns" value="0" tabindex="98" />
+              <label class="hide" for="score-2-6-4-1">Area 4 crowns</label>
+              <input id="score-2-6-4-1" type="number" min="0" class="js-score" data-player="2" data-territory="6" data-area="4" data-count="crowns" value="0" tabindex="100" />
+            </div>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-2-6-1-2">Squares</label>
+              <input id="score-2-6-1-2" type="number" min="0" class="js-score" data-player="2" data-territory="6" data-area="1" data-count="squares" value="0" tabindex="95" />
+              <label class="hide" for="score-2-6-2-2">Crowns</label>
+              <input id="score-2-6-2-2" type="number" min="0" class="js-score" data-player="2" data-territory="6" data-area="2" data-count="squares" value="0" tabindex="97" />
+              <label class="hide" for="score-2-6-3-2">Area 3 crowns</label>
+              <input id="score-2-6-3-2" type="number" min="0" class="js-score" data-player="2" data-territory="6" data-area="3" data-count="squares" value="0" tabindex="99" />
+              <label class="hide" for="score-2-6-4-2">Area 4 crowns</label>
+              <input id="score-2-6-4-2" type="number" min="0" class="js-score" data-player="2" data-territory="6" data-area="4" data-count="squares" value="0" tabindex="101" />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Subtotals</span>
+              <label class="hide" for="score-2-6-1">Area 1 totals</label>
+              <input id="score-2-6-1" type="number" min="0" class="js-area-subtotal" data-player="2" data-territory="6" data-area="1" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-2-6-2">Area 2 total</label>
+              <input id="score-2-6-2" type="number" min="0" class="js-area-subtotal" data-player="2" data-territory="6" data-area="2" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-2-6-3">Area 3 total</label>
+              <input id="score-2-6-3" type="number" min="0" class="js-area-subtotal" data-player="2" data-territory="6" data-area="3" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-2-6-4">Area 4 total</label>
+              <input id="score-2-6-4" type="number" min="0" class="js-area-subtotal" data-player="2" data-territory="6" data-area="4" value="0" tabindex="-1" disabled />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Total</span>
+              <label class="hide" for="score-2-6">Territory 6 total</label>
+              <input id="score-2-6" type="number" min="0" class="js-territory-subtotal" data-player="2" data-territory="6" value="0" tabindex="-1" disabled />
+            </div>
+          </li>
+        </ul>
+        <div class="bonuses">
+          <h2 class="row-label">Bonuses (<span class="js-total-bonus">0</span>)</h2>
+          <button class="js-bonus" data-value="5" data-player="2" data-active="off">Complete +5</button>
+          <button class="js-bonus" data-value="10" data-player="2" data-active="off">Centre castle +10</button>
+        </div>
+        <div class="total-score">Player 2 score = <span class="js-total-score" data-player="2">0</span></div>
+      </div>
+      <div class="js-player-area" data-player="3" style="display: none;">
+        <ul class="territories">
+          <li class="row">
+            <h2 class="row-label">Grasslands (<span class="js-territory-subtotal-text" data-player="3" data-territory="1">0</span>)</h2>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-3-1-1-1">Crowns</label>
+              <input id="score-3-1-1-1" type="number" min="0" class="js-score" data-player="3" data-territory="1" data-area="1" data-count="crowns" value="0" tabindex="53" />
+              <label class="hide" for="score-3-1-2-1">Crowns</label>
+              <input id="score-3-1-2-1" type="number" min="0" class="js-score" data-player="3" data-territory="1" data-area="2" data-count="crowns" value="0" tabindex="55" />
+              <label class="hide" for="score-3-1-3-1">Area 3 crowns</label>
+              <input id="score-3-1-3-1" type="number" min="0" class="js-score" data-player="3" data-territory="1" data-area="3" data-count="crowns" value="0" tabindex="57" />
+              <label class="hide" for="score-3-1-4-1">Area 4 crowns</label>
+              <input id="score-3-1-4-1" type="number" min="0" class="js-score" data-player="3" data-territory="1" data-area="4" data-count="crowns" value="0" tabindex="59" />
+            </div>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-3-1-1-2">Squares</label>
+              <input id="score-3-1-1-2" type="number" min="0" class="js-score" data-player="3" data-territory="1" data-area="1" data-count="squares" value="0" tabindex="54" />
+              <label class="hide" for="score-3-1-2-2">Crowns</label>
+              <input id="score-3-1-2-2" type="number" min="0" class="js-score" data-player="3" data-territory="1" data-area="2" data-count="squares" value="0" tabindex="56" />
+              <label class="hide" for="score-3-1-3-2">Area 3 crowns</label>
+              <input id="score-3-1-3-2" type="number" min="0" class="js-score" data-player="3" data-territory="1" data-area="3" data-count="squares" value="0" tabindex="58" />
+              <label class="hide" for="score-3-1-4-2">Area 4 crowns</label>
+              <input id="score-3-1-4-2" type="number" min="0" class="js-score" data-player="3" data-territory="1" data-area="4" data-count="squares" value="0" tabindex="60" />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Subtotals</span>
+              <label class="hide" for="score-3-1-1">Area 1 totals</label>
+              <input id="score-3-1-1" type="number" min="0" class="js-area-subtotal" data-player="3" data-territory="1" data-area="1" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-3-1-2">Area 2 total</label>
+              <input id="score-3-1-2" type="number" min="0" class="js-area-subtotal" data-player="3" data-territory="1" data-area="2" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-3-1-3">Area 3 total</label>
+              <input id="score-3-1-3" type="number" min="0" class="js-area-subtotal" data-player="3" data-territory="1" data-area="3" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-3-1-4">Area 4 total</label>
+              <input id="score-3-1-4" type="number" min="0" class="js-area-subtotal" data-player="3" data-territory="1" data-area="4" value="0" tabindex="-1" disabled />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Total</span>
+              <label class="hide" for="score-3-1">Territory 1 total</label>
+              <input id="score-3-1" type="number" min="0" class="js-territory-subtotal" data-player="3" data-territory="1" value="0" tabindex="-1" disabled />
+            </div>
+          </li>
+          <li class="row">
+            <h2 class="row-label">Cornfields (<span class="js-territory-subtotal-text" data-player="3" data-territory="2">0</span>)</h2>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-3-2-1-1">Crowns</label>
+              <input id="score-3-2-1-1" type="number" min="0" class="js-score" data-player="3" data-territory="2" data-area="1" data-count="crowns" value="0" tabindex="61" />
+              <label class="hide" for="score-3-2-2-1">Crowns</label>
+              <input id="score-3-2-2-1" type="number" min="0" class="js-score" data-player="3" data-territory="2" data-area="2" data-count="crowns" value="0" tabindex="63" />
+              <label class="hide" for="score-3-2-3-1">Area 3 crowns</label>
+              <input id="score-3-2-3-1" type="number" min="0" class="js-score" data-player="3" data-territory="2" data-area="3" data-count="crowns" value="0" tabindex="65" />
+              <label class="hide" for="score-3-2-4-1">Area 4 crowns</label>
+              <input id="score-3-2-4-1" type="number" min="0" class="js-score" data-player="3" data-territory="2" data-area="4" data-count="crowns" value="0" tabindex="67" />
+            </div>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-3-2-1-2">Squares</label>
+              <input id="score-3-2-1-2" type="number" min="0" class="js-score" data-player="3" data-territory="2" data-area="1" data-count="squares" value="0" tabindex="62" />
+              <label class="hide" for="score-3-2-2-2">Crowns</label>
+              <input id="score-3-2-2-2" type="number" min="0" class="js-score" data-player="3" data-territory="2" data-area="2" data-count="squares" value="0" tabindex="64" />
+              <label class="hide" for="score-3-2-3-2">Area 3 crowns</label>
+              <input id="score-3-2-3-2" type="number" min="0" class="js-score" data-player="3" data-territory="2" data-area="3" data-count="squares" value="0" tabindex="66" />
+              <label class="hide" for="score-3-2-4-2">Area 4 crowns</label>
+              <input id="score-3-2-4-2" type="number" min="0" class="js-score" data-player="3" data-territory="2" data-area="4" data-count="squares" value="0" tabindex="68" />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Subtotals</span>
+              <label class="hide" for="score-3-2-1">Area 1 totals</label>
+              <input id="score-3-2-1" type="number" min="0" class="js-area-subtotal" data-player="3" data-territory="2" data-area="1" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-3-2-2">Area 2 total</label>
+              <input id="score-3-2-2" type="number" min="0" class="js-area-subtotal" data-player="3" data-territory="2" data-area="2" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-3-2-3">Area 3 total</label>
+              <input id="score-3-2-3" type="number" min="0" class="js-area-subtotal" data-player="3" data-territory="2" data-area="3" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-3-2-4">Area 4 total</label>
+              <input id="score-3-2-4" type="number" min="0" class="js-area-subtotal" data-player="3" data-territory="2" data-area="4" value="0" tabindex="-1" disabled />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Total</span>
+              <label class="hide" for="score-3-2">Territory 2 total</label>
+              <input id="score-3-2" type="number" min="0" class="js-territory-subtotal" data-player="3" data-territory="2" value="0" tabindex="-1" disabled />
+            </div>
+          </li>
+          <li class="row">
+            <h2 class="row-label">Wastelands (<span class="js-territory-subtotal-text" data-player="3" data-territory="3">0</span>)</h2>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-3-3-1-1">Crowns</label>
+              <input id="score-3-3-1-1" type="number" min="0" class="js-score" data-player="3" data-territory="3" data-area="1" data-count="crowns" value="0" tabindex="69" />
+              <label class="hide" for="score-3-3-2-1">Crowns</label>
+              <input id="score-3-3-2-1" type="number" min="0" class="js-score" data-player="3" data-territory="3" data-area="2" data-count="crowns" value="0" tabindex="71" />
+              <label class="hide" for="score-3-3-3-1">Area 3 crowns</label>
+              <input id="score-3-3-3-1" type="number" min="0" class="js-score" data-player="3" data-territory="3" data-area="3" data-count="crowns" value="0" tabindex="73" />
+              <label class="hide" for="score-3-3-4-1">Area 4 crowns</label>
+              <input id="score-3-3-4-1" type="number" min="0" class="js-score" data-player="3" data-territory="3" data-area="4" data-count="crowns" value="0" tabindex="75" />
+            </div>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-3-3-1-2">Squares</label>
+              <input id="score-3-3-1-2" type="number" min="0" class="js-score" data-player="3" data-territory="3" data-area="1" data-count="squares" value="0" tabindex="70" />
+              <label class="hide" for="score-3-3-2-2">Crowns</label>
+              <input id="score-3-3-2-2" type="number" min="0" class="js-score" data-player="3" data-territory="3" data-area="2" data-count="squares" value="0" tabindex="72" />
+              <label class="hide" for="score-3-3-3-2">Area 3 crowns</label>
+              <input id="score-3-3-3-2" type="number" min="0" class="js-score" data-player="3" data-territory="3" data-area="3" data-count="squares" value="0" tabindex="74" />
+              <label class="hide" for="score-3-3-4-2">Area 4 crowns</label>
+              <input id="score-3-3-4-2" type="number" min="0" class="js-score" data-player="3" data-territory="3" data-area="4" data-count="squares" value="0" tabindex="76" />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Subtotals</span>
+              <label class="hide" for="score-3-3-1">Area 1 totals</label>
+              <input id="score-3-3-1" type="number" min="0" class="js-area-subtotal" data-player="3" data-territory="3" data-area="1" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-3-3-2">Area 2 total</label>
+              <input id="score-3-3-2" type="number" min="0" class="js-area-subtotal" data-player="3" data-territory="3" data-area="2" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-3-3-3">Area 3 total</label>
+              <input id="score-3-3-3" type="number" min="0" class="js-area-subtotal" data-player="3" data-territory="3" data-area="3" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-3-3-4">Area 4 total</label>
+              <input id="score-3-3-4" type="number" min="0" class="js-area-subtotal" data-player="3" data-territory="3" data-area="4" value="0" tabindex="-1" disabled />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Total</span>
+              <label class="hide" for="score-3-3">Territory 3 total</label>
+              <input id="score-3-3" type="number" min="0" class="js-territory-subtotal" data-player="3" data-territory="3" value="0" tabindex="-1" disabled />
+            </div>
+          </li>
+          <li class="row">
+            <h2 class="row-label">Woods (<span class="js-territory-subtotal-text" data-player="3" data-territory="4">0</span>)</h2>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-3-4-1-1">Crowns</label>
+              <input id="score-3-4-1-1" type="number" min="0" class="js-score" data-player="3" data-territory="4" data-area="1" data-count="crowns" value="0" tabindex="77" />
+              <label class="hide" for="score-3-4-2-1">Crowns</label>
+              <input id="score-3-4-2-1" type="number" min="0" class="js-score" data-player="3" data-territory="4" data-area="2" data-count="crowns" value="0" tabindex="79" />
+              <label class="hide" for="score-3-4-3-1">Area 3 crowns</label>
+              <input id="score-3-4-3-1" type="number" min="0" class="js-score" data-player="3" data-territory="4" data-area="3" data-count="crowns" value="0" tabindex="81" />
+              <label class="hide" for="score-3-4-4-1">Area 4 crowns</label>
+              <input id="score-3-4-4-1" type="number" min="0" class="js-score" data-player="3" data-territory="4" data-area="4" data-count="crowns" value="0" tabindex="83" />
+            </div>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-3-4-1-2">Squares</label>
+              <input id="score-3-4-1-2" type="number" min="0" class="js-score" data-player="3" data-territory="4" data-area="1" data-count="squares" value="0" tabindex="78" />
+              <label class="hide" for="score-3-4-2-2">Crowns</label>
+              <input id="score-3-4-2-2" type="number" min="0" class="js-score" data-player="3" data-territory="4" data-area="2" data-count="squares" value="0" tabindex="80" />
+              <label class="hide" for="score-3-4-3-2">Area 3 crowns</label>
+              <input id="score-3-4-3-2" type="number" min="0" class="js-score" data-player="3" data-territory="4" data-area="3" data-count="squares" value="0" tabindex="82" />
+              <label class="hide" for="score-3-4-4-2">Area 4 crowns</label>
+              <input id="score-3-4-4-2" type="number" min="0" class="js-score" data-player="3" data-territory="4" data-area="4" data-count="squares" value="0" tabindex="84" />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Subtotals</span>
+              <label class="hide" for="score-3-4-1">Area 1 totals</label>
+              <input id="score-3-4-1" type="number" min="0" class="js-area-subtotal" data-player="3" data-territory="4" data-area="1" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-3-4-2">Area 2 total</label>
+              <input id="score-3-4-2" type="number" min="0" class="js-area-subtotal" data-player="3" data-territory="4" data-area="2" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-3-4-3">Area 3 total</label>
+              <input id="score-3-4-3" type="number" min="0" class="js-area-subtotal" data-player="3" data-territory="4" data-area="3" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-3-4-4">Area 4 total</label>
+              <input id="score-3-4-4" type="number" min="0" class="js-area-subtotal" data-player="3" data-territory="4" data-area="4" value="0" tabindex="-1" disabled />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Total</span>
+              <label class="hide" for="score-3-4">Territory 4 total</label>
+              <input id="score-3-4" type="number" min="0" class="js-territory-subtotal" data-player="3" data-territory="4" value="0" tabindex="-1" disabled />
+            </div>
+          </li>
+          <li class="row">
+            <h2 class="row-label">Lakes (<span class="js-territory-subtotal-text" data-player="3" data-territory="5">0</span>)</h2>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-3-5-1-1">Crowns</label>
+              <input id="score-3-5-1-1" type="number" min="0" class="js-score" data-player="3" data-territory="5" data-area="1" data-count="crowns" value="0" tabindex="85" />
+              <label class="hide" for="score-3-5-2-1">Crowns</label>
+              <input id="score-3-5-2-1" type="number" min="0" class="js-score" data-player="3" data-territory="5" data-area="2" data-count="crowns" value="0" tabindex="87" />
+              <label class="hide" for="score-3-5-3-1">Area 3 crowns</label>
+              <input id="score-3-5-3-1" type="number" min="0" class="js-score" data-player="3" data-territory="5" data-area="3" data-count="crowns" value="0" tabindex="89" />
+              <label class="hide" for="score-3-5-4-1">Area 4 crowns</label>
+              <input id="score-3-5-4-1" type="number" min="0" class="js-score" data-player="3" data-territory="5" data-area="4" data-count="crowns" value="0" tabindex="91" />
+            </div>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-3-5-1-2">Squares</label>
+              <input id="score-3-5-1-2" type="number" min="0" class="js-score" data-player="3" data-territory="5" data-area="1" data-count="squares" value="0" tabindex="86" />
+              <label class="hide" for="score-3-5-2-2">Crowns</label>
+              <input id="score-3-5-2-2" type="number" min="0" class="js-score" data-player="3" data-territory="5" data-area="2" data-count="squares" value="0" tabindex="88" />
+              <label class="hide" for="score-3-5-3-2">Area 3 crowns</label>
+              <input id="score-3-5-3-2" type="number" min="0" class="js-score" data-player="3" data-territory="5" data-area="3" data-count="squares" value="0" tabindex="90" />
+              <label class="hide" for="score-3-5-4-2">Area 4 crowns</label>
+              <input id="score-3-5-4-2" type="number" min="0" class="js-score" data-player="3" data-territory="5" data-area="4" data-count="squares" value="0" tabindex="93" />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Subtotals</span>
+              <label class="hide" for="score-3-5-1">Area 1 totals</label>
+              <input id="score-3-5-1" type="number" min="0" class="js-area-subtotal" data-player="3" data-territory="5" data-area="1" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-3-5-2">Area 2 total</label>
+              <input id="score-3-5-2" type="number" min="0" class="js-area-subtotal" data-player="3" data-territory="5" data-area="2" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-3-5-3">Area 3 total</label>
+              <input id="score-3-5-3" type="number" min="0" class="js-area-subtotal" data-player="3" data-territory="5" data-area="3" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-3-5-4">Area 4 total</label>
+              <input id="score-3-5-4" type="number" min="0" class="js-area-subtotal" data-player="3" data-territory="5" data-area="4" value="0" tabindex="-1" disabled />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Total</span>
+              <label class="hide" for="score-3-5">Territory 5 total</label>
+              <input id="score-3-5" type="number" min="0" class="js-territory-subtotal" data-player="3" data-territory="5" value="0" tabindex="-1" disabled />
+            </div>
+          </li>
+          <li class="row">
+            <h2 class="row-label">Caves (<span class="js-territory-subtotal-text" data-player="3" data-territory="6">0</span>)</h2>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-3-6-1-1">Crowns</label>
+              <input id="score-3-6-1-1" type="number" min="0" class="js-score" data-player="3" data-territory="6" data-area="1" data-count="crowns" value="0" tabindex="94" />
+              <label class="hide" for="score-3-6-2-1">Crowns</label>
+              <input id="score-3-6-2-1" type="number" min="0" class="js-score" data-player="3" data-territory="6" data-area="2" data-count="crowns" value="0" tabindex="96" />
+              <label class="hide" for="score-3-6-3-1">Area 3 crowns</label>
+              <input id="score-3-6-3-1" type="number" min="0" class="js-score" data-player="3" data-territory="6" data-area="3" data-count="crowns" value="0" tabindex="98" />
+              <label class="hide" for="score-3-6-4-1">Area 4 crowns</label>
+              <input id="score-3-6-4-1" type="number" min="0" class="js-score" data-player="3" data-territory="6" data-area="4" data-count="crowns" value="0" tabindex="100" />
+            </div>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-3-6-1-2">Squares</label>
+              <input id="score-3-6-1-2" type="number" min="0" class="js-score" data-player="3" data-territory="6" data-area="1" data-count="squares" value="0" tabindex="95" />
+              <label class="hide" for="score-3-6-2-2">Crowns</label>
+              <input id="score-3-6-2-2" type="number" min="0" class="js-score" data-player="3" data-territory="6" data-area="2" data-count="squares" value="0" tabindex="97" />
+              <label class="hide" for="score-3-6-3-2">Area 3 crowns</label>
+              <input id="score-3-6-3-2" type="number" min="0" class="js-score" data-player="3" data-territory="6" data-area="3" data-count="squares" value="0" tabindex="99" />
+              <label class="hide" for="score-3-6-4-2">Area 4 crowns</label>
+              <input id="score-3-6-4-2" type="number" min="0" class="js-score" data-player="3" data-territory="6" data-area="4" data-count="squares" value="0" tabindex="101" />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Subtotals</span>
+              <label class="hide" for="score-3-6-1">Area 1 totals</label>
+              <input id="score-3-6-1" type="number" min="0" class="js-area-subtotal" data-player="3" data-territory="6" data-area="1" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-3-6-2">Area 2 total</label>
+              <input id="score-3-6-2" type="number" min="0" class="js-area-subtotal" data-player="3" data-territory="6" data-area="2" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-3-6-3">Area 3 total</label>
+              <input id="score-3-6-3" type="number" min="0" class="js-area-subtotal" data-player="3" data-territory="6" data-area="3" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-3-6-4">Area 4 total</label>
+              <input id="score-3-6-4" type="number" min="0" class="js-area-subtotal" data-player="3" data-territory="6" data-area="4" value="0" tabindex="-1" disabled />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Total</span>
+              <label class="hide" for="score-3-6">Territory 6 total</label>
+              <input id="score-3-6" type="number" min="0" class="js-territory-subtotal" data-player="3" data-territory="6" value="0" tabindex="-1" disabled />
+            </div>
+          </li>
+        </ul>
+        <div class="bonuses">
+          <h2 class="row-label">Bonuses (<span class="js-total-bonus">0</span>)</h2>
+          <button class="js-bonus" data-value="5" data-player="3" data-active="off">Complete +5</button>
+          <button class="js-bonus" data-value="10" data-player="3" data-active="off">Centre castle +10</button>
+        </div>
+        <div class="total-score">Player 3 score = <span class="js-total-score" data-player="3">0</span></div>
+      </div>
+      <div class="js-player-area" data-player="4" style="display: none;">
+        <ul class="territories">
+          <li class="row">
+            <h2 class="row-label">Grasslands (<span class="js-territory-subtotal-text" data-player="4" data-territory="1">0</span>)</h2>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-4-1-1-1">Crowns</label>
+              <input id="score-4-1-1-1" type="number" min="0" class="js-score" data-player="4" data-territory="1" data-area="1" data-count="crowns" value="0" tabindex="53" />
+              <label class="hide" for="score-4-1-2-1">Crowns</label>
+              <input id="score-4-1-2-1" type="number" min="0" class="js-score" data-player="4" data-territory="1" data-area="2" data-count="crowns" value="0" tabindex="55" />
+              <label class="hide" for="score-4-1-3-1">Area 3 crowns</label>
+              <input id="score-4-1-3-1" type="number" min="0" class="js-score" data-player="4" data-territory="1" data-area="3" data-count="crowns" value="0" tabindex="57" />
+              <label class="hide" for="score-4-1-4-1">Area 4 crowns</label>
+              <input id="score-4-1-4-1" type="number" min="0" class="js-score" data-player="4" data-territory="1" data-area="4" data-count="crowns" value="0" tabindex="59" />
+            </div>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-4-1-1-2">Squares</label>
+              <input id="score-4-1-1-2" type="number" min="0" class="js-score" data-player="4" data-territory="1" data-area="1" data-count="squares" value="0" tabindex="54" />
+              <label class="hide" for="score-4-1-2-2">Crowns</label>
+              <input id="score-4-1-2-2" type="number" min="0" class="js-score" data-player="4" data-territory="1" data-area="2" data-count="squares" value="0" tabindex="56" />
+              <label class="hide" for="score-4-1-3-2">Area 3 crowns</label>
+              <input id="score-4-1-3-2" type="number" min="0" class="js-score" data-player="4" data-territory="1" data-area="3" data-count="squares" value="0" tabindex="58" />
+              <label class="hide" for="score-4-1-4-2">Area 4 crowns</label>
+              <input id="score-4-1-4-2" type="number" min="0" class="js-score" data-player="4" data-territory="1" data-area="4" data-count="squares" value="0" tabindex="60" />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Subtotals</span>
+              <label class="hide" for="score-4-1-1">Area 1 totals</label>
+              <input id="score-4-1-1" type="number" min="0" class="js-area-subtotal" data-player="4" data-territory="1" data-area="1" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-4-1-2">Area 2 total</label>
+              <input id="score-4-1-2" type="number" min="0" class="js-area-subtotal" data-player="4" data-territory="1" data-area="2" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-4-1-3">Area 3 total</label>
+              <input id="score-4-1-3" type="number" min="0" class="js-area-subtotal" data-player="4" data-territory="1" data-area="3" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-4-1-4">Area 4 total</label>
+              <input id="score-4-1-4" type="number" min="0" class="js-area-subtotal" data-player="4" data-territory="1" data-area="4" value="0" tabindex="-1" disabled />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Total</span>
+              <label class="hide" for="score-4-1">Territory 1 total</label>
+              <input id="score-4-1" type="number" min="0" class="js-territory-subtotal" data-player="4" data-territory="1" value="0" tabindex="-1" disabled />
+            </div>
+          </li>
+          <li class="row">
+            <h2 class="row-label">Cornfields (<span class="js-territory-subtotal-text" data-player="4" data-territory="2">0</span>)</h2>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-4-2-1-1">Crowns</label>
+              <input id="score-4-2-1-1" type="number" min="0" class="js-score" data-player="4" data-territory="2" data-area="1" data-count="crowns" value="0" tabindex="61" />
+              <label class="hide" for="score-4-2-2-1">Crowns</label>
+              <input id="score-4-2-2-1" type="number" min="0" class="js-score" data-player="4" data-territory="2" data-area="2" data-count="crowns" value="0" tabindex="63" />
+              <label class="hide" for="score-4-2-3-1">Area 3 crowns</label>
+              <input id="score-4-2-3-1" type="number" min="0" class="js-score" data-player="4" data-territory="2" data-area="3" data-count="crowns" value="0" tabindex="65" />
+              <label class="hide" for="score-4-2-4-1">Area 4 crowns</label>
+              <input id="score-4-2-4-1" type="number" min="0" class="js-score" data-player="4" data-territory="2" data-area="4" data-count="crowns" value="0" tabindex="67" />
+            </div>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-4-2-1-2">Squares</label>
+              <input id="score-4-2-1-2" type="number" min="0" class="js-score" data-player="4" data-territory="2" data-area="1" data-count="squares" value="0" tabindex="62" />
+              <label class="hide" for="score-4-2-2-2">Crowns</label>
+              <input id="score-4-2-2-2" type="number" min="0" class="js-score" data-player="4" data-territory="2" data-area="2" data-count="squares" value="0" tabindex="64" />
+              <label class="hide" for="score-4-2-3-2">Area 3 crowns</label>
+              <input id="score-4-2-3-2" type="number" min="0" class="js-score" data-player="4" data-territory="2" data-area="3" data-count="squares" value="0" tabindex="66" />
+              <label class="hide" for="score-4-2-4-2">Area 4 crowns</label>
+              <input id="score-4-2-4-2" type="number" min="0" class="js-score" data-player="4" data-territory="2" data-area="4" data-count="squares" value="0" tabindex="68" />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Subtotals</span>
+              <label class="hide" for="score-4-2-1">Area 1 totals</label>
+              <input id="score-4-2-1" type="number" min="0" class="js-area-subtotal" data-player="4" data-territory="2" data-area="1" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-4-2-2">Area 2 total</label>
+              <input id="score-4-2-2" type="number" min="0" class="js-area-subtotal" data-player="4" data-territory="2" data-area="2" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-4-2-3">Area 3 total</label>
+              <input id="score-4-2-3" type="number" min="0" class="js-area-subtotal" data-player="4" data-territory="2" data-area="3" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-4-2-4">Area 4 total</label>
+              <input id="score-4-2-4" type="number" min="0" class="js-area-subtotal" data-player="4" data-territory="2" data-area="4" value="0" tabindex="-1" disabled />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Total</span>
+              <label class="hide" for="score-4-2">Territory 2 total</label>
+              <input id="score-4-2" type="number" min="0" class="js-territory-subtotal" data-player="4" data-territory="2" value="0" tabindex="-1" disabled />
+            </div>
+          </li>
+          <li class="row">
+            <h2 class="row-label">Wastelands (<span class="js-territory-subtotal-text" data-player="4" data-territory="3">0</span>)</h2>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-4-3-1-1">Crowns</label>
+              <input id="score-4-3-1-1" type="number" min="0" class="js-score" data-player="4" data-territory="3" data-area="1" data-count="crowns" value="0" tabindex="69" />
+              <label class="hide" for="score-4-3-2-1">Crowns</label>
+              <input id="score-4-3-2-1" type="number" min="0" class="js-score" data-player="4" data-territory="3" data-area="2" data-count="crowns" value="0" tabindex="71" />
+              <label class="hide" for="score-4-3-3-1">Area 3 crowns</label>
+              <input id="score-4-3-3-1" type="number" min="0" class="js-score" data-player="4" data-territory="3" data-area="3" data-count="crowns" value="0" tabindex="73" />
+              <label class="hide" for="score-4-3-4-1">Area 4 crowns</label>
+              <input id="score-4-3-4-1" type="number" min="0" class="js-score" data-player="4" data-territory="3" data-area="4" data-count="crowns" value="0" tabindex="75" />
+            </div>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-4-3-1-2">Squares</label>
+              <input id="score-4-3-1-2" type="number" min="0" class="js-score" data-player="4" data-territory="3" data-area="1" data-count="squares" value="0" tabindex="70" />
+              <label class="hide" for="score-4-3-2-2">Crowns</label>
+              <input id="score-4-3-2-2" type="number" min="0" class="js-score" data-player="4" data-territory="3" data-area="2" data-count="squares" value="0" tabindex="72" />
+              <label class="hide" for="score-4-3-3-2">Area 3 crowns</label>
+              <input id="score-4-3-3-2" type="number" min="0" class="js-score" data-player="4" data-territory="3" data-area="3" data-count="squares" value="0" tabindex="74" />
+              <label class="hide" for="score-4-3-4-2">Area 4 crowns</label>
+              <input id="score-4-3-4-2" type="number" min="0" class="js-score" data-player="4" data-territory="3" data-area="4" data-count="squares" value="0" tabindex="76" />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Subtotals</span>
+              <label class="hide" for="score-4-3-1">Area 1 totals</label>
+              <input id="score-4-3-1" type="number" min="0" class="js-area-subtotal" data-player="4" data-territory="3" data-area="1" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-4-3-2">Area 2 total</label>
+              <input id="score-4-3-2" type="number" min="0" class="js-area-subtotal" data-player="4" data-territory="3" data-area="2" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-4-3-3">Area 3 total</label>
+              <input id="score-4-3-3" type="number" min="0" class="js-area-subtotal" data-player="4" data-territory="3" data-area="3" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-4-3-4">Area 4 total</label>
+              <input id="score-4-3-4" type="number" min="0" class="js-area-subtotal" data-player="4" data-territory="3" data-area="4" value="0" tabindex="-1" disabled />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Total</span>
+              <label class="hide" for="score-4-3">Territory 3 total</label>
+              <input id="score-4-3" type="number" min="0" class="js-territory-subtotal" data-player="4" data-territory="3" value="0" tabindex="-1" disabled />
+            </div>
+          </li>
+          <li class="row">
+            <h2 class="row-label">Woods (<span class="js-territory-subtotal-text" data-player="4" data-territory="4">0</span>)</h2>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-4-4-1-1">Crowns</label>
+              <input id="score-4-4-1-1" type="number" min="0" class="js-score" data-player="4" data-territory="4" data-area="1" data-count="crowns" value="0" tabindex="77" />
+              <label class="hide" for="score-4-4-2-1">Crowns</label>
+              <input id="score-4-4-2-1" type="number" min="0" class="js-score" data-player="4" data-territory="4" data-area="2" data-count="crowns" value="0" tabindex="79" />
+              <label class="hide" for="score-4-4-3-1">Area 3 crowns</label>
+              <input id="score-4-4-3-1" type="number" min="0" class="js-score" data-player="4" data-territory="4" data-area="3" data-count="crowns" value="0" tabindex="81" />
+              <label class="hide" for="score-4-4-4-1">Area 4 crowns</label>
+              <input id="score-4-4-4-1" type="number" min="0" class="js-score" data-player="4" data-territory="4" data-area="4" data-count="crowns" value="0" tabindex="83" />
+            </div>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-4-4-1-2">Squares</label>
+              <input id="score-4-4-1-2" type="number" min="0" class="js-score" data-player="4" data-territory="4" data-area="1" data-count="squares" value="0" tabindex="78" />
+              <label class="hide" for="score-4-4-2-2">Crowns</label>
+              <input id="score-4-4-2-2" type="number" min="0" class="js-score" data-player="4" data-territory="4" data-area="2" data-count="squares" value="0" tabindex="80" />
+              <label class="hide" for="score-4-4-3-2">Area 3 crowns</label>
+              <input id="score-4-4-3-2" type="number" min="0" class="js-score" data-player="4" data-territory="4" data-area="3" data-count="squares" value="0" tabindex="82" />
+              <label class="hide" for="score-4-4-4-2">Area 4 crowns</label>
+              <input id="score-4-4-4-2" type="number" min="0" class="js-score" data-player="4" data-territory="4" data-area="4" data-count="squares" value="0" tabindex="84" />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Subtotals</span>
+              <label class="hide" for="score-4-4-1">Area 1 totals</label>
+              <input id="score-4-4-1" type="number" min="0" class="js-area-subtotal" data-player="4" data-territory="4" data-area="1" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-4-4-2">Area 2 total</label>
+              <input id="score-4-4-2" type="number" min="0" class="js-area-subtotal" data-player="4" data-territory="4" data-area="2" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-4-4-3">Area 3 total</label>
+              <input id="score-4-4-3" type="number" min="0" class="js-area-subtotal" data-player="4" data-territory="4" data-area="3" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-4-4-4">Area 4 total</label>
+              <input id="score-4-4-4" type="number" min="0" class="js-area-subtotal" data-player="4" data-territory="4" data-area="4" value="0" tabindex="-1" disabled />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Total</span>
+              <label class="hide" for="score-4-4">Territory 4 total</label>
+              <input id="score-4-4" type="number" min="0" class="js-territory-subtotal" data-player="4" data-territory="4" value="0" tabindex="-1" disabled />
+            </div>
+          </li>
+          <li class="row">
+            <h2 class="row-label">Lakes (<span class="js-territory-subtotal-text" data-player="4" data-territory="5">0</span>)</h2>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-4-5-1-1">Crowns</label>
+              <input id="score-4-5-1-1" type="number" min="0" class="js-score" data-player="4" data-territory="5" data-area="1" data-count="crowns" value="0" tabindex="85" />
+              <label class="hide" for="score-4-5-2-1">Crowns</label>
+              <input id="score-4-5-2-1" type="number" min="0" class="js-score" data-player="4" data-territory="5" data-area="2" data-count="crowns" value="0" tabindex="87" />
+              <label class="hide" for="score-4-5-3-1">Area 3 crowns</label>
+              <input id="score-4-5-3-1" type="number" min="0" class="js-score" data-player="4" data-territory="5" data-area="3" data-count="crowns" value="0" tabindex="89" />
+              <label class="hide" for="score-4-5-4-1">Area 4 crowns</label>
+              <input id="score-4-5-4-1" type="number" min="0" class="js-score" data-player="4" data-territory="5" data-area="4" data-count="crowns" value="0" tabindex="91" />
+            </div>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-4-5-1-2">Squares</label>
+              <input id="score-4-5-1-2" type="number" min="0" class="js-score" data-player="4" data-territory="5" data-area="1" data-count="squares" value="0" tabindex="86" />
+              <label class="hide" for="score-4-5-2-2">Crowns</label>
+              <input id="score-4-5-2-2" type="number" min="0" class="js-score" data-player="4" data-territory="5" data-area="2" data-count="squares" value="0" tabindex="88" />
+              <label class="hide" for="score-4-5-3-2">Area 3 crowns</label>
+              <input id="score-4-5-3-2" type="number" min="0" class="js-score" data-player="4" data-territory="5" data-area="3" data-count="squares" value="0" tabindex="90" />
+              <label class="hide" for="score-4-5-4-2">Area 4 crowns</label>
+              <input id="score-4-5-4-2" type="number" min="0" class="js-score" data-player="4" data-territory="5" data-area="4" data-count="squares" value="0" tabindex="93" />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Subtotals</span>
+              <label class="hide" for="score-4-5-1">Area 1 totals</label>
+              <input id="score-4-5-1" type="number" min="0" class="js-area-subtotal" data-player="4" data-territory="5" data-area="1" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-4-5-2">Area 2 total</label>
+              <input id="score-4-5-2" type="number" min="0" class="js-area-subtotal" data-player="4" data-territory="5" data-area="2" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-4-5-3">Area 3 total</label>
+              <input id="score-4-5-3" type="number" min="0" class="js-area-subtotal" data-player="4" data-territory="5" data-area="3" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-4-5-4">Area 4 total</label>
+              <input id="score-4-5-4" type="number" min="0" class="js-area-subtotal" data-player="4" data-territory="5" data-area="4" value="0" tabindex="-1" disabled />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Total</span>
+              <label class="hide" for="score-4-5">Territory 5 total</label>
+              <input id="score-4-5" type="number" min="0" class="js-territory-subtotal" data-player="4" data-territory="5" value="0" tabindex="-1" disabled />
+            </div>
+          </li>
+          <li class="row">
+            <h2 class="row-label">Caves (<span class="js-territory-subtotal-text" data-player="4" data-territory="6">0</span>)</h2>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-4-6-1-1">Crowns</label>
+              <input id="score-4-6-1-1" type="number" min="0" class="js-score" data-player="4" data-territory="6" data-area="1" data-count="crowns" value="0" tabindex="94" />
+              <label class="hide" for="score-4-6-2-1">Crowns</label>
+              <input id="score-4-6-2-1" type="number" min="0" class="js-score" data-player="4" data-territory="6" data-area="2" data-count="crowns" value="0" tabindex="96" />
+              <label class="hide" for="score-4-6-3-1">Area 3 crowns</label>
+              <input id="score-4-6-3-1" type="number" min="0" class="js-score" data-player="4" data-territory="6" data-area="3" data-count="crowns" value="0" tabindex="98" />
+              <label class="hide" for="score-4-6-4-1">Area 4 crowns</label>
+              <input id="score-4-6-4-1" type="number" min="0" class="js-score" data-player="4" data-territory="6" data-area="4" data-count="crowns" value="0" tabindex="100" />
+            </div>
+            <div class="row-mini">
+              <label class="row-mini-label" for="score-4-6-1-2">Squares</label>
+              <input id="score-4-6-1-2" type="number" min="0" class="js-score" data-player="4" data-territory="6" data-area="1" data-count="squares" value="0" tabindex="95" />
+              <label class="hide" for="score-4-6-2-2">Crowns</label>
+              <input id="score-4-6-2-2" type="number" min="0" class="js-score" data-player="4" data-territory="6" data-area="2" data-count="squares" value="0" tabindex="97" />
+              <label class="hide" for="score-4-6-3-2">Area 3 crowns</label>
+              <input id="score-4-6-3-2" type="number" min="0" class="js-score" data-player="4" data-territory="6" data-area="3" data-count="squares" value="0" tabindex="99" />
+              <label class="hide" for="score-4-6-4-2">Area 4 crowns</label>
+              <input id="score-4-6-4-2" type="number" min="0" class="js-score" data-player="4" data-territory="6" data-area="4" data-count="squares" value="0" tabindex="101" />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Subtotals</span>
+              <label class="hide" for="score-4-6-1">Area 1 totals</label>
+              <input id="score-4-6-1" type="number" min="0" class="js-area-subtotal" data-player="4" data-territory="6" data-area="1" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-4-6-2">Area 2 total</label>
+              <input id="score-4-6-2" type="number" min="0" class="js-area-subtotal" data-player="4" data-territory="6" data-area="2" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-4-6-3">Area 3 total</label>
+              <input id="score-4-6-3" type="number" min="0" class="js-area-subtotal" data-player="4" data-territory="6" data-area="3" value="0" tabindex="-1" disabled />
+              <label class="hide" for="score-4-6-4">Area 4 total</label>
+              <input id="score-4-6-4" type="number" min="0" class="js-area-subtotal" data-player="4" data-territory="6" data-area="4" value="0" tabindex="-1" disabled />
+            </div>
+            <div class="row-mini hide">
+              <span class="row-mini-label">Total</span>
+              <label class="hide" for="score-4-6">Territory 6 total</label>
+              <input id="score-4-6" type="number" min="0" class="js-territory-subtotal" data-player="4" data-territory="6" value="0" tabindex="-1" disabled />
+            </div>
+          </li>
+        </ul>
+        <div class="bonuses">
+          <h2 class="row-label">Bonuses (<span class="js-total-bonus">0</span>)</h2>
+          <button class="js-bonus" data-value="5" data-player="4" data-active="off">Complete +5</button>
+          <button class="js-bonus" data-value="10" data-player="4" data-active="off">Centre castle +10</button>
+        </div>
+        <div class="total-score">Player 4 score = <span class="js-total-score" data-player="4">0</span></div>
+      </div>
+    </div>
+
+    <script>
+      const players = document.querySelectorAll(".js-player-switch");
+      const playerAreas = document.querySelectorAll(".js-player-area");
+      const currentPlayer = document.querySelector(".js-player");
+      const elemScores = document.querySelectorAll(".js-score");
+      const elemBonuses = document.querySelectorAll(".js-bonus");
+      const elemAreaSubTotalScores = document.querySelectorAll(".js-area-subtotal");
+
+      // Switch player
+      players.forEach((player) => {
+        player.addEventListener('change', (e) => {
+          if (player.checked) {
+            currentPlayer.value = player.value;
+            playerAreas.forEach((playerArea) => {
+              if (playerArea.dataset.player == currentPlayer.value) {
+                playerArea.style.display = 'block';
+              } else {
+                playerArea.style.display = 'none';
+              }
+            });
+          }
+        });
+      });
+      elemScores.forEach((elemScore) => {
+        elemScore.addEventListener('change', (e) => {
+          if (!elemScore.value) {
+            elemScore.value = 0;
+          }
+          updateAreaSubTotalScore(currentPlayer.value,elemScore.dataset.territory,elemScore.dataset.area);
+        });
+        elemScore.addEventListener('focus', (e) => {
+          elemScore.select();
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        });
+        elemScore.addEventListener('contextmenu', (e) => {
+          e.preventDefault();
+        });
+      });
+
+      // Update a bonus
+      function toggleBonus(index) {
+
+        var elemBonus = elemBonuses[index];
+
+        if (elemBonus.dataset.active == 'off') {
+          elemBonus.dataset.active = 'on';
+          elemBonus.classList.add('on');
+        } else {
+          elemBonus.dataset.active = 'off';
+          elemBonus.classList.remove('on');
+        }
+      }
+
+      // Toggle bonuses
+      elemBonuses.forEach((elemBonus, index) => {
+        elemBonus.addEventListener('click', function(e) {
+          toggleBonus(index);
+          updateTotalScore(currentPlayer.value);
+        });
+      });
+
+      // Update an area subtotal
+      function updateAreaSubTotalScore(player, territory, area) {
+
+        var areaSubTotalScoreInput = document.querySelector(".js-area-subtotal[data-player='" + player + "'][data-territory='" + territory + "'][data-area='" + area + "']");
+        var areaCrownsScore = document.querySelector(".js-score[data-player='" + player + "'][data-territory='" + territory + "'][data-area='" + area + "'][data-count='crowns']").value;
+        var areaSquaresScore = document.querySelector(".js-score[data-player='" + player + "'][data-territory='" + territory + "'][data-area='" + area + "'][data-count='squares']").value;
+
+        areaSubTotalScoreInput.value = areaCrownsScore * areaSquaresScore;
+        updateTerritorySubTotalScore(player,territory);
+      }
+
+      // Update a territory subtotal
+      function updateTerritorySubTotalScore(player, territory) {
+
+        var territorySubTotal = 0;
+        var territorySubTotalScoreInput = document.querySelector(".js-territory-subtotal[data-player='" + player + "'][data-territory='" + territory + "']");
+        var territorySubTotalScoreText = document.querySelector(".js-territory-subtotal-text[data-player='" + player + "'][data-territory='" + territory + "']");
+        var areaSubTotalScoreInputs = document.querySelectorAll(".js-area-subtotal[data-player='" + player + "'][data-territory='" + territory + "']");
+
+        areaSubTotalScoreInputs.forEach((areaSubTotalScoreInput) => {
+          territorySubTotal += parseInt(areaSubTotalScoreInput.value);
+        });
+        territorySubTotalScoreInput.value = territorySubTotal;
+        territorySubTotalScoreText.innerHTML = territorySubTotal;
+        updateTotalScore(player);
+      }
+
+      // Update the total
+      function updateTotalScore(player) {
+
+        var total = 0;
+        var bonuses = document.querySelectorAll(".js-bonus[data-player='" + player + "']");
+        var totalScoreDisplays = document.querySelectorAll(".js-total-score[data-player='" + player + "']");
+        var territorySubTotalScoreInputs = document.querySelectorAll(".js-territory-subtotal[data-player='" + player + "']");
+
+        territorySubTotalScoreInputs.forEach((territorySubTotalScoreInput) => {
+          total += parseInt(territorySubTotalScoreInput.value);
+        });
+        bonuses.forEach((bonus) => {
+          if (bonus.dataset.active == 'on') {
+            total += parseInt(bonus.dataset.value);
+          }
+        });
+        totalScoreDisplays.forEach((totalScoreDisplay) => {
+          totalScoreDisplay.innerHTML = total;
+        });
+      }
+    </script>
+  </body>
+</html>
