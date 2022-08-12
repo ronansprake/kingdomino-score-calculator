@@ -1044,117 +1044,114 @@
         <div class="total-score">Player 4 score = <span class="js-total-score" data-player="4">0</span></div>
       </div>
     </div>
-
     <script>
-      const players = document.querySelectorAll(".js-player-switch");
-      const playerAreas = document.querySelectorAll(".js-player-area");
-      const currentPlayer = document.querySelector(".js-player");
-      const elemScores = document.querySelectorAll(".js-score");
-      const elemBonuses = document.querySelectorAll(".js-bonus");
-      const elemAreaSubTotalScores = document.querySelectorAll(".js-area-subtotal");
+    const players = document.querySelectorAll(".js-player-switch");
+    const playerAreas = document.querySelectorAll(".js-player-area");
+    const currentPlayer = document.querySelector(".js-player");
+    const elemScores = document.querySelectorAll(".js-score");
+    const elemBonuses = document.querySelectorAll(".js-bonus");
+    const elemAreaSubTotalScores = document.querySelectorAll(".js-area-subtotal");
 
-      // Switch player
-      players.forEach((player) => {
-        player.addEventListener('change', (e) => {
-          if (player.checked) {
-            currentPlayer.value = player.value;
-            playerAreas.forEach((playerArea) => {
-              if (playerArea.dataset.player == currentPlayer.value) {
-                playerArea.style.display = 'block';
-              } else {
-                playerArea.style.display = 'none';
-              }
-            });
-          }
-        });
-      });
-      elemScores.forEach((elemScore) => {
-        elemScore.addEventListener('change', (e) => {
-          if (!elemScore.value) {
-            elemScore.value = 0;
-          }
-          updateAreaSubTotalScore(currentPlayer.value,elemScore.dataset.territory,elemScore.dataset.area);
-        });
-        elemScore.addEventListener('focus', (e) => {
-          elemScore.select();
-          e.preventDefault();
-          e.stopPropagation();
-          return false;
-        });
-        elemScore.addEventListener('contextmenu', (e) => {
-          e.preventDefault();
-        });
-      });
-
-      // Update a bonus
-      function toggleBonus(index) {
-
-        var elemBonus = elemBonuses[index];
-
-        if (elemBonus.dataset.active == 'off') {
-          elemBonus.dataset.active = 'on';
-          elemBonus.classList.add('on');
-        } else {
-          elemBonus.dataset.active = 'off';
-          elemBonus.classList.remove('on');
+    // Switch player
+    players.forEach((player) => {
+      player.addEventListener('change', (e) => {
+        if (player.checked) {
+          currentPlayer.value = player.value;
+          playerAreas.forEach((playerArea) => {
+            if (playerArea.dataset.player == currentPlayer.value) {
+              playerArea.style.display = 'block';
+            } else {
+              playerArea.style.display = 'none';
+            }
+          });
         }
-      }
+      });
+    });
 
-      // Toggle bonuses
-      elemBonuses.forEach((elemBonus, index) => {
-        elemBonus.addEventListener('click', function(e) {
-          toggleBonus(index);
-          updateTotalScore(currentPlayer.value);
-        });
+    elemScores.forEach((elemScore) => {
+      // Listen for changes to individual scores
+      elemScore.addEventListener('change', (e) => {
+        if (!elemScore.value) {
+          elemScore.value = 0;
+        }
+        updateAreaSubTotalScore(currentPlayer.value,elemScore.dataset.territory,elemScore.dataset.area);
       });
 
-      // Update an area subtotal
-      function updateAreaSubTotalScore(player, territory, area) {
+      // On focus of individual score, highlight all text
+      elemScore.addEventListener('focus', (e) => {
+        elemScore.select();
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      });
 
-        var areaSubTotalScoreInput = document.querySelector(".js-area-subtotal[data-player='" + player + "'][data-territory='" + territory + "'][data-area='" + area + "']");
-        var areaCrownsScore = document.querySelector(".js-score[data-player='" + player + "'][data-territory='" + territory + "'][data-area='" + area + "'][data-count='crowns']").value;
-        var areaSquaresScore = document.querySelector(".js-score[data-player='" + player + "'][data-territory='" + territory + "'][data-area='" + area + "'][data-count='squares']").value;
+      // On focus of individual score, suppress context menu
+      elemScore.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+      });
+    });
 
-        areaSubTotalScoreInput.value = areaCrownsScore * areaSquaresScore;
-        updateTerritorySubTotalScore(player,territory);
+    // Update a bonus
+    function toggleBonus(index) {
+      var elemBonus = elemBonuses[index];
+      if (elemBonus.dataset.active == 'off') {
+        elemBonus.dataset.active = 'on';
+        elemBonus.classList.add('on');
+      } else {
+        elemBonus.dataset.active = 'off';
+        elemBonus.classList.remove('on');
       }
+    }
 
-      // Update a territory subtotal
-      function updateTerritorySubTotalScore(player, territory) {
+    // Toggle bonus state when clicked
+    elemBonuses.forEach((elemBonus, index) => {
+      elemBonus.addEventListener('click', function(e) {
+        toggleBonus(index);
+        updateTotalScore(currentPlayer.value);
+      });
+    });
 
-        var territorySubTotal = 0;
-        var territorySubTotalScoreInput = document.querySelector(".js-territory-subtotal[data-player='" + player + "'][data-territory='" + territory + "']");
-        var territorySubTotalScoreText = document.querySelector(".js-territory-subtotal-text[data-player='" + player + "'][data-territory='" + territory + "']");
-        var areaSubTotalScoreInputs = document.querySelectorAll(".js-area-subtotal[data-player='" + player + "'][data-territory='" + territory + "']");
+    // Update an area subtotal
+    function updateAreaSubTotalScore(player, territory, area) {
+      var areaSubTotalScoreInput = document.querySelector(".js-area-subtotal[data-player='" + player + "'][data-territory='" + territory + "'][data-area='" + area + "']");
+      var areaCrownsScore = document.querySelector(".js-score[data-player='" + player + "'][data-territory='" + territory + "'][data-area='" + area + "'][data-count='crowns']").value;
+      var areaSquaresScore = document.querySelector(".js-score[data-player='" + player + "'][data-territory='" + territory + "'][data-area='" + area + "'][data-count='squares']").value;
+      areaSubTotalScoreInput.value = areaCrownsScore * areaSquaresScore;
+      updateTerritorySubTotalScore(player,territory);
+    }
 
-        areaSubTotalScoreInputs.forEach((areaSubTotalScoreInput) => {
-          territorySubTotal += parseInt(areaSubTotalScoreInput.value);
-        });
-        territorySubTotalScoreInput.value = territorySubTotal;
-        territorySubTotalScoreText.innerHTML = territorySubTotal;
-        updateTotalScore(player);
-      }
+    // Update a territory subtotal
+    function updateTerritorySubTotalScore(player, territory) {
+      var territorySubTotal = 0;
+      var territorySubTotalScoreInput = document.querySelector(".js-territory-subtotal[data-player='" + player + "'][data-territory='" + territory + "']");
+      var territorySubTotalScoreText = document.querySelector(".js-territory-subtotal-text[data-player='" + player + "'][data-territory='" + territory + "']");
+      var areaSubTotalScoreInputs = document.querySelectorAll(".js-area-subtotal[data-player='" + player + "'][data-territory='" + territory + "']");
+      areaSubTotalScoreInputs.forEach((areaSubTotalScoreInput) => {
+        territorySubTotal += parseInt(areaSubTotalScoreInput.value);
+      });
+      territorySubTotalScoreInput.value = territorySubTotal;
+      territorySubTotalScoreText.innerHTML = territorySubTotal;
+      updateTotalScore(player);
+    }
 
-      // Update the total
-      function updateTotalScore(player) {
-
-        var total = 0;
-        var bonuses = document.querySelectorAll(".js-bonus[data-player='" + player + "']");
-        var totalScoreDisplays = document.querySelectorAll(".js-total-score[data-player='" + player + "']");
-        var territorySubTotalScoreInputs = document.querySelectorAll(".js-territory-subtotal[data-player='" + player + "']");
-
-        territorySubTotalScoreInputs.forEach((territorySubTotalScoreInput) => {
-          total += parseInt(territorySubTotalScoreInput.value);
-        });
-        bonuses.forEach((bonus) => {
-          if (bonus.dataset.active == 'on') {
-            total += parseInt(bonus.dataset.value);
-          }
-        });
-        totalScoreDisplays.forEach((totalScoreDisplay) => {
-          totalScoreDisplay.innerHTML = total;
-        });
-      }
+    // Update the total
+    function updateTotalScore(player) {
+      var total = 0;
+      var bonuses = document.querySelectorAll(".js-bonus[data-player='" + player + "']");
+      var totalScoreDisplays = document.querySelectorAll(".js-total-score[data-player='" + player + "']");
+      var territorySubTotalScoreInputs = document.querySelectorAll(".js-territory-subtotal[data-player='" + player + "']");
+      territorySubTotalScoreInputs.forEach((territorySubTotalScoreInput) => {
+        total += parseInt(territorySubTotalScoreInput.value);
+      });
+      bonuses.forEach((bonus) => {
+        if (bonus.dataset.active == 'on') {
+          total += parseInt(bonus.dataset.value);
+        }
+      });
+      totalScoreDisplays.forEach((totalScoreDisplay) => {
+        totalScoreDisplay.innerHTML = total;
+      });
+    }
     </script>
   </body>
 </html>
